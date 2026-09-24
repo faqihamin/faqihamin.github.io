@@ -1,3 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>{{ page.title }} | {{ site.title }}</title>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 1000px;
+      margin: auto;
+      padding: 30px 20px;
+      line-height: 1.6;
+    }
+
+    .game-container {
+      max-width: 800px;
+      margin: auto;
+    }
+
+    #board {
+      width: min(90vw, 600px);
+      margin: 30px auto;
+    }
+
+    .controls {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin: 20px 0;
+      flex-wrap: wrap;
+    }
+
+    button {
+      padding: 10px 18px;
+      font-size: 16px;
+      cursor: pointer;
+      border: 1px solid #999;
+      border-radius: 5px;
+      background: #f5f5f5;
+    }
+
+    button:hover {
+      background: #e5e5e5;
+    }
+
+    #move-info {
+      text-align: center;
+      font-weight: bold;
+      margin: 15px;
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="game-container">
+
+  <h1>{{ page.title }}</h1>
+
+  {{ content }}
+
+  <div id="board"></div>
+
+  <div id="move-info">
+    Starting position
+  </div>
+
+  <div class="controls">
+    <button id="start">⏮ Start</button>
+    <button id="previous">◀ Previous</button>
+    <button id="next">Next ▶</button>
+    <button id="end">End ⏭</button>
+  </div>
+
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.3/chess.min.js"></script>
+
+<script>
+const moves = {{ page.moves | jsonify }};
+
+const game = new Chess();
+let currentMove = 0;
+
+const boardElement = document.getElementById("board");
+const moveInfo = document.getElementById("move-info");
+
+function drawBoard() {
+
+  boardElement.innerHTML = "";
+
+  const board = document.createElement("div");
+
+  board.style.display = "grid";
+  board.style.gridTemplateColumns = "repeat(8, 1fr)";
+  board.style.width = "100%";
+  board.style.aspectRatio = "1";
+
+  const position = game.board();
+
+  for (let row = 0; row < 8; row++) {
+
+    for (let col = 0; col < 8; col++) {
+
+      const square = document.createElement("div");
+
+      square.style.display = "flex";
+      square.style.alignItems = "center";
+      square.style.justifyContent = "center";
+      square.style.fontSize = "clamp(25px, 7vw, 55px)";
+
+      if ((row + col) % 2 === 0) {
+        square.style.background = "#f0d9b5";
+      } else {
+        square.style.background = "#b58863";
+      }
+
+      const piece = position[row][col];
+
+      if (piece) {
+
+        const symbols = {
+          w: {
+            p: "♙",
+            r: "♖",
+            n: "♘",
+            b: "♗",
+            q: "♕",
+            k: "♔"
+          },
+          b: {
+            p: "♟",
+            r: "♜",
+            n: "♞",
+            b: "♝",
+            q: "♛",
+            k: "♚"
+          }
+        };
+
+        square.textContent = symbols[piece.color][piece.type];
+      }
+
+      board.appendChild(square);
+    }
+  }
+
+  boardElement.appendChild(board);
+
+  moveInfo.textContent =
+    currentMove === 0
+      ? "Starting position"
+      : "After move " + currentMove + ": " + moves[currentMove - 1];
+}
+
+
+function updatePosition() {
+
+  game.reset();
+
+  for (let i = 0; i < currentMove; i++) {
+    game.move(moves[i]);
+  }
+
+  drawBoard();
+}
+
+
+document.getElementById("start").onclick = function() {
+  currentMove = 0;
+  updatePosition();
+};
+
+
+document.getElementById("previous").onclick = function() {
+  if (currentMove > 0) {
+    currentMove--;
+    updatePosition();
+  }
+};
+
+
 document.getElementById("next").onclick = function() {
   if (currentMove < moves.length) {
     currentMove++;
