@@ -1,0 +1,19 @@
+document.getElementById("next").onclick = function() {
+  if (currentMove < moves.length) {
+    currentMove++;
+    updatePosition();
+  }
+};
+
+
+document.getElementById("end").onclick = function() {
+  currentMove = moves.length;
+  updatePosition();
+};
+
+
+updatePosition();
+</script>
+
+</body>
+</html>
