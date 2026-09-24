@@ -1,4 +1,10 @@
-title: Your Name
-description: Physics | Research | Notes
-
+title: Chess with Your Name
+description: Annotated chess games, lessons and ideas
 theme: minima
+
+markdown: kramdown
+
+collections:
+  games:
+    output: true
+    permalink: /games/:name/
